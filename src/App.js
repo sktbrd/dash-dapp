@@ -1,4 +1,7 @@
-import React from 'react';
+import {
+  React,
+  useEffect,
+} from 'react';
 import {
   ChakraProvider,
   Box,
@@ -11,8 +14,51 @@ import {
 } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
+import { KeepKeySdk } from '@keepkey/keepkey-sdk'
 
 function App() {
+
+  let onStart = async function(){
+    try{
+      let spec = 'http://localhost:1646/spec/swagger.json'
+      let apiKey = localStorage.getItem("apiKey");
+      let config = {
+        apiKey: apiKey || 'test-123',
+        pairingInfo:{
+          name: process.env['SERVICE_NAME'] || 'DASH',
+          imageUrl: process.env['SERVICE_IMAGE_URL'] || 'https://assets.coincap.io/assets/icons/dash@2x.png',
+          basePath:spec
+        }
+      }
+
+      //init
+      let sdk = await KeepKeySdk.create(config)
+      localStorage.setItem("apiKey",config.apiKey);
+      console.log("config: ",config.apiKey)
+
+      let path =
+        {
+          symbol: 'DASH',
+          address_n: [0x80000000 + 44, 0x80000000 + 5, 0x80000000 + 0],
+          coin: 'Bitcoin',
+          script_type: 'p2pkh',
+          showDisplay: false
+        }
+
+      let responsePubkey = await sdk.system.info.getPublicKey(path)
+      console.log("responsePubkey: ", responsePubkey)
+      console.log("responsePubkey: ", responsePubkey.xpub)
+
+    }catch(e){
+      console.error(e)
+    }
+  }
+
+  // onStart()
+  useEffect(() => {
+    onStart()
+  }, [])
+
   return (
     <ChakraProvider theme={theme}>
       <Box textAlign="center" fontSize="xl">
