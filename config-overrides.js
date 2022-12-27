@@ -8,6 +8,7 @@ module.exports = function override(config) {
         "assert": require.resolve("assert"),
         "http": require.resolve("stream-http"),
         "https": require.resolve("https-browserify"),
+        "zlib": require.resolve("browserify-zlib"),
         "os": require.resolve("os-browserify"),
         "url": require.resolve("url"),
         "net": require.resolve("net"),
