@@ -56,7 +56,7 @@ function App() {
       const configPioneer = {
         queryKey:'sdk:test-tutorial-medium',
         username:"dash-dapp",
-        spec:"http://localhost:9001/spec/swagger.json"
+        spec:"https://pioneers.dev/spec/swagger.json"
       }
       let pioneer = new Client(configPioneer.spec,configPioneer)
       pioneer = await pioneer.init()
