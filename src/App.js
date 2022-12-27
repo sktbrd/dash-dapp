@@ -2,25 +2,34 @@ import {
   React,
   useEffect,
   useState,
+
 } from 'react';
 import {
   ChakraProvider,
   Box,
   Text,
-  Link,
   VStack,
-  Code,
   Grid,
   theme,
+  Modal,
+  Button,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure
 } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
 import { KeepKeySdk } from '@keepkey/keepkey-sdk'
-import { Client } from '@pioneer-platform/pioneer-client'
+let pioneerApi = require("@pioneer-platform/pioneer-client")
 
 function App() {
   const [address, setAddress] = useState('')
   const [balance, setBalance] = useState('0.000')
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   let onStart = async function(){
     try{
@@ -57,8 +66,9 @@ function App() {
         queryKey:'sdk:test-tutorial-medium',
         username:"dash-dapp",
         spec:"https://pioneers.dev/spec/swagger.json"
+        //spec:"http://localhost:9001/spec/swagger.json"
       }
-      let pioneer = new Client(configPioneer.spec,configPioneer)
+      let pioneer = new pioneerApi(configPioneer.spec,configPioneer)
       pioneer = await pioneer.init()
 
       //get balance DASH
@@ -71,7 +81,7 @@ function App() {
         balance += parseInt(data[i].value)
       }
       console.log("balance: ",balance)
-      let balanceNative = balance
+      let balanceNative = balance / 100000000
       setBalance(balanceNative)
 
     }catch(e){
@@ -86,6 +96,23 @@ function App() {
 
   return (
     <ChakraProvider theme={theme}>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Modal Title</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            Send Dash
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme='blue' mr={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button variant='ghost'>Secondary Action</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Box textAlign="center" fontSize="xl">
         <Grid minH="100vh" p={3}>
           <ColorModeSwitcher justifySelf="flex-end" />
@@ -97,6 +124,7 @@ function App() {
             <Text>
               balance: {balance}
             </Text>
+            <Button onClick={onOpen}>Send Dash</Button>
           </VStack>
         </Grid>
       </Box>
