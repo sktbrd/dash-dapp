@@ -16,6 +16,7 @@ import {
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
 import { KeepKeySdk } from '@keepkey/keepkey-sdk'
+import { Client } from '@pioneer-platform/pioneer-client'
 
 function App() {
   const [address, setAddress] = useState('')
@@ -51,6 +52,27 @@ function App() {
       let responsePubkey = await sdk.system.info.getPublicKey(path)
       console.log("responsePubkey: ", responsePubkey)
       console.log("responsePubkey: ", responsePubkey.xpub)
+
+      const configPioneer = {
+        queryKey:'sdk:test-tutorial-medium',
+        username:"dash-dapp",
+        spec:"http://localhost:9001/spec/swagger.json"
+      }
+      let pioneer = new Client(configPioneer.spec,configPioneer)
+      pioneer = await pioneer.init()
+
+      //get balance DASH
+      let data = await pioneer.ListUnspent({network:'DASH',xpub:responsePubkey.xpub})
+      data = data.data
+      console.log("txData: ",data)
+
+      let balance = 0
+      for(let i = 0; i < data.length; i++){
+        balance += parseInt(data[i].value)
+      }
+      console.log("balance: ",balance)
+      let balanceNative = balance
+      setBalance(balanceNative)
 
     }catch(e){
       console.error(e)
