@@ -1,6 +1,7 @@
 import {
   React,
   useEffect,
+  useState,
 } from 'react';
 import {
   ChakraProvider,
@@ -17,6 +18,8 @@ import { Logo } from './Logo';
 import { KeepKeySdk } from '@keepkey/keepkey-sdk'
 
 function App() {
+  const [address, setAddress] = useState('')
+  const [balance, setBalance] = useState('0.000')
 
   let onStart = async function(){
     try{
@@ -67,17 +70,11 @@ function App() {
           <VStack spacing={8}>
             <Logo h="40vmin" pointerEvents="none" />
             <Text>
-              Edit <Code fontSize="xl">src/App.js</Code> and save to reload.
+              address: {address}
             </Text>
-            <Link
-              color="teal.500"
-              href="https://chakra-ui.com"
-              fontSize="2xl"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learn Chakra
-            </Link>
+            <Text>
+              balance: {balance}
+            </Text>
           </VStack>
         </Grid>
       </Box>
