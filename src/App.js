@@ -346,7 +346,7 @@ function App() {
             </div>
             <br/>
             {error ? <div>error: {error}</div> : <div></div>}
-            {txid ? <div>txid: {txid}</div> : <div></div>}
+            {txid ? <div>txid: <a href={'https://chainz.cryptoid.info/dash/tx.dws?'+txid+'.htm'}/> {txid}</div> : <div></div>}
             {txid ? <div></div> : <div>
               {signedTx ? <div>signedTx: {signedTx}</div> : <div></div>}
             </div>}
