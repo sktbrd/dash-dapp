@@ -9,7 +9,7 @@
     "@chakra-ui/react": "^2.4.5",
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
-    "@keepkey/keepkey-sdk": "^0.2.8",
+    "@keepkey/keepkey-sdk": "0.2.12",
     "@pioneer-platform/pioneer-client": "8.1.30",
     "@pioneer-platform/pioneer-coins": "^8.1.53",
     "@shapeshiftoss/hdwallet-core": "^1.41.0",

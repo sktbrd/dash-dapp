@@ -49,12 +49,14 @@ const configPioneer = {
 
 function App() {
   const [address, setAddress] = useState('')
+  const [xpub, setXpub] = useState('')
   const [balance, setBalance] = useState('0.000')
   const [amount, setAmount] = useState('0.00000000')
   const [toAddress, setToAddress] = useState('')
   const [txid, setTxid] = useState(null)
-  const [inputs, setInputs] = useState([])
   const [signedTx, setSignedTx] = useState(null)
+  const [keepkeyConnected, setKeepKeyConnected] = useState(false)
+  const [keepkeyError, setKeepKeyError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -69,6 +71,9 @@ function App() {
       let sdk = await KeepKeySdk.create(configKeepKey)
       localStorage.setItem("apiKey",configKeepKey.apiKey);
       console.log("config: ",configKeepKey.apiKey)
+
+      let inputs = await pioneer.ListUnspent({network:'DASH',xpub})
+      inputs = inputs.data
 
       //balance check
       let amountOut = parseInt(amount * 100000000)
@@ -155,7 +160,7 @@ function App() {
         showDisplay: false
       }
 
-      let changeAddress = await sdk.address.uTXOGetAddress({
+      let changeAddress = await sdk.address.utxoGetAddress({
         address_n: addressInfo.addressNList,
         script_type:addressInfo.scriptType,
         coin:addressInfo.coin
@@ -204,7 +209,8 @@ function App() {
 
       //signTx
       let signedTxTransfer = await sdk.utxo.utxoSignTransaction(hdwalletTxDescription)
-      signedTxTransfer = JSON.parse(signedTxTransfer)
+      console.log("signedTxTransfer: ",signedTxTransfer)
+      // signedTxTransfer = JSON.parse(signedTxTransfer)
       setSignedTx(signedTxTransfer.serializedTx)
 
     }catch(e){
@@ -248,9 +254,15 @@ function App() {
       configKeepKey.apiKey = apiKey
 
       //init
-      let sdk = await KeepKeySdk.create(configKeepKey)
-      localStorage.setItem("apiKey",configKeepKey.apiKey);
-      console.log("config: ",configKeepKey.apiKey)
+      let sdk
+      try{
+        sdk = await KeepKeySdk.create(configKeepKey)
+        localStorage.setItem("apiKey",configKeepKey.apiKey);
+        console.log("config: ",configKeepKey.apiKey)
+      }catch(e){
+        setKeepKeyError('Bridge is offline!')
+      }
+
 
       let path =
         {
@@ -264,6 +276,7 @@ function App() {
       let responsePubkey = await sdk.system.info.getPublicKey(path)
       console.log("responsePubkey: ", responsePubkey)
       console.log("responsePubkey: ", responsePubkey.xpub)
+      setXpub(responsePubkey.xpub)
 
       let pioneer = new pioneerApi(configPioneer.spec,configPioneer)
       pioneer = await pioneer.init()
@@ -286,7 +299,7 @@ function App() {
         showDisplay: false
       }
 
-      let address = await sdk.address.uTXOGetAddress({
+      let address = await sdk.address.utxoGetAddress({
         address_n: addressInfo.addressNList,
         script_type:addressInfo.scriptType,
         coin:addressInfo.coin
@@ -339,7 +352,7 @@ function App() {
             </div>
             <br/>
             {error ? <div>error: {error}</div> : <div></div>}
-            {txid ? <div>txid: <a href={'https://chainz.cryptoid.info/dash/tx.dws?'+txid+'.htm'}/> {txid}</div> : <div></div>}
+            {txid ? <div>txid: <a href={'https://blockchair.com/dash/transaction/?'+txid}>{txid}</a></div> : <div></div>}
             {txid ? <div></div> : <div>
               {signedTx ? <div>signedTx: {signedTx}</div> : <div></div>}
             </div>}
@@ -369,6 +382,8 @@ function App() {
         <Grid minH="100vh" p={3}>
           <ColorModeSwitcher justifySelf="flex-end" />
           <VStack spacing={8}>
+            {keepkeyError ? <div>KeepKey not online! <a href='https://www.keepkey.com/'>Download KeepKey Desktop.</a></div> : <div></div>}
+            {keepkeyConnected ? <div>loading KeepKey....</div> : <div></div>}
             {isLoading ? <div>loading...</div> : <div>
               <Logo h="40vmin" pointerEvents="none" />
               <Text>
