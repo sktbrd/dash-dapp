@@ -202,7 +202,7 @@ function App() {
       }
 
       //signTx
-      let signedTxTransfer = await sdk.bitcoin.btcSignTransaction(hdwalletTxDescription)
+      let signedTxTransfer = await sdk.utxo.utxoSignTransaction(hdwalletTxDescription)
       signedTxTransfer = JSON.parse(signedTxTransfer)
       setSignedTx(signedTxTransfer.serializedTx)
 
