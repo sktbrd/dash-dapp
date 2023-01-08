@@ -55,6 +55,7 @@ function App() {
   const [txid, setTxid] = useState(null)
   const [inputs, setInputs] = useState([])
   const [signedTx, setSignedTx] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -268,18 +269,9 @@ function App() {
       pioneer = await pioneer.init()
 
       //get balance DASH
-      let data = await pioneer.ListUnspent({network:'DASH',xpub:responsePubkey.xpub})
-      data = data.data
-      setInputs(data)
-      console.log("txData: ",data)
-
-      let balance = 0
-      for(let i = 0; i < data.length; i++){
-        balance += parseInt(data[i].value)
-      }
-      console.log("balance: ",balance)
-      let balanceNative = balance / 100000000
-      setBalance(balanceNative)
+      let balance = await pioneer.GetBalance({network:'DASH',xpub:responsePubkey.xpub})
+      balance = balance.data
+      setBalance(balance)
 
       //get new address
       let newAddyIndex = await pioneer.GetChangeAddress({network:'DASH',xpub:responsePubkey.xpub})
@@ -301,6 +293,7 @@ function App() {
       })
       console.log("address: ",address)
       setAddress(address.address)
+      setIsLoading(false)
     }catch(e){
       console.error(e)
     }
@@ -376,14 +369,16 @@ function App() {
         <Grid minH="100vh" p={3}>
           <ColorModeSwitcher justifySelf="flex-end" />
           <VStack spacing={8}>
-            <Logo h="40vmin" pointerEvents="none" />
-            <Text>
-              address: {address}
-            </Text>
-            <Text>
-              balance: {balance}
-            </Text>
-            <Button onClick={onOpen}>Send Dash</Button>
+            {isLoading ? <div>loading...</div> : <div>
+              <Logo h="40vmin" pointerEvents="none" />
+              <Text>
+                address: {address}
+              </Text>
+              <Text>
+                balance: {balance}
+              </Text>
+              <Button onClick={onOpen}>Send Dash</Button>
+            </div>}
           </VStack>
         </Grid>
       </Box>
