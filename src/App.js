@@ -358,7 +358,7 @@ function App() {
             </div>}
 
           </ModalBody>
-
+          Vlads Dash App
           <ModalFooter>
             {!signedTx ? <div>
               <Button colorScheme='green' mr={3} onClick={onSend}>
